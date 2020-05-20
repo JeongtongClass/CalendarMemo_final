@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
+    SQLiteHelper dbHelper;
+
     RecyclerView recyclerView;
     RecyclerAdapter recyclerAdapter;
     Button btnAdd;
@@ -38,8 +40,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        memoList=new ArrayList<>();
-        memoList.add(new Memo("분리수거하기","2020-05-06",1));
+
+        dbHelper=new SQLiteHelper(MainActivity.this);
+        //memoList=new ArrayList<>();
+        memoList=dbHelper.selectAll(); //
 
         recyclerView=findViewById(R.id.recyclerview);
 
@@ -61,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -68,11 +73,13 @@ public class MainActivity extends AppCompatActivity {
         if(requestCode== 0){
             String strMain=data.getStringExtra("main");
             String strSub=data.getStringExtra("sub");
+            String strTime=data.getStringExtra("time");
 
-            Memo memo=new Memo(strMain,strSub,0);
+            Memo memo=new Memo(strMain,strSub,strTime,0);
             recyclerAdapter.addItem(memo);
             recyclerAdapter.notifyDataSetChanged();
 
+            dbHelper.insertMemo(memo);
         }
     }
 
@@ -101,9 +108,11 @@ public class MainActivity extends AppCompatActivity {
         public void onBindViewHolder(@NonNull ItemViewHolder itemViewHolder, int i) {
             Memo memo=listdata.get(i);
 
+            //seq가져오기
+            itemViewHolder.maintext.setTag(memo.getSeq());
             itemViewHolder.maintext.setText(memo.getMaintext());
-
             itemViewHolder.subtext.setText(memo.getSubtext());
+            itemViewHolder.timetext.setText(memo.getTimetext());
 
             //imageview는 0일때와 1일때의 색상이 다름,
             if(memo.getIsdone()==0){ //0일때는 회색
@@ -127,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
         class ItemViewHolder extends RecyclerView.ViewHolder{
             private TextView maintext;
             private TextView subtext;
+            private TextView timetext;
             private ImageView img;
 
             public ItemViewHolder(@NonNull View itemView){
@@ -134,11 +144,26 @@ public class MainActivity extends AppCompatActivity {
 
                 maintext=itemView.findViewById(R.id.item_maintext);
                 subtext=itemView.findViewById(R.id.item_subtext);
-
-                //subtext=itemView.findViewById(R.id.textView_date);
+                timetext=itemView.findViewById(R.id.item_time);
                 img=itemView.findViewById(R.id.item_image);
 
+                itemView.setOnLongClickListener(new View.OnLongClickListener(){
 
+                    @Override
+                    public boolean onLongClick(View view) {
+                        //메모하나를 길게 눌렀을 때 해당 메모의 포지션을 가져온다.
+                        //이때 포지션은 DB의 포지션이 아니라 현재 화면에 보이는 리스트 중 몇번쨰인가를 가져오는것->seq가져오기
+                        int position =getAdapterPosition();
+                        int seq=(int)maintext.getTag();
+
+                        if(position!=RecyclerView.NO_POSITION){
+                            dbHelper.deleteMemo(seq);
+                            removeItem(position);
+                            notifyDataSetChanged();
+                        }
+                        return false;
+                    }
+                });
             }
         }
     }
