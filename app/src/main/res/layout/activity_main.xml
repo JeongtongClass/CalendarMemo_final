@@ -22,9 +22,23 @@
             android:layout_weight="1"
             />
     </ScrollView>
-    <Button
-        android:id="@+id/btnAdd"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="일정 추가하기" />
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/btnAdd"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+
+            android:text="일정 추가하기" />
+
+        <Button
+            android:id="@+id/btnAlarm"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="알람 등록하기"/>
+
+    </LinearLayout>
+
 </LinearLayout>

@@ -6,10 +6,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,11 +35,16 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     SQLiteHelper dbHelper;
+    private Calendar calendar;
+    private TimePicker timePicker;
 
     RecyclerView recyclerView;
     RecyclerAdapter recyclerAdapter;
     Button btnAdd;
+    Button btnAlarm;
     List<Memo> memoList;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
         recyclerAdapter=new RecyclerAdapter(memoList);
         recyclerView.setAdapter(recyclerAdapter);
         btnAdd=findViewById(R.id.btnAdd);
+        btnAlarm=findViewById(R.id.btnAlarm);
+
 
         //버튼에 onClick리스너를 달아서 버튼 클릭시 addActivity
         btnAdd.setOnClickListener(new View.OnClickListener(){
@@ -64,16 +76,26 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent,0);
             }
         });
+
+        btnAlarm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent=new Intent(MainActivity.this,AlarmActivity.class);
+                startActivityForResult(intent,1);
+            }
+        });
+
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if(requestCode== 0){
-            String strMain=data.getStringExtra("main");
-            String strSub=data.getStringExtra("sub");
-            String strTime=data.getStringExtra("time");
+        if(requestCode==0){
+            String strMain = data.getStringExtra("main");
+            String strSub = data.getStringExtra("sub");
+            String strTime = data.getStringExtra("time");
 
             Memo memo=new Memo(strMain,strSub,strTime,0);
             recyclerAdapter.addItem(memo);
@@ -81,7 +103,11 @@ public class MainActivity extends AppCompatActivity {
 
             dbHelper.insertMemo(memo);
         }
+
     }
+
+
+
 
     class RecyclerAdapter extends RecyclerView.Adapter<RecyclerAdapter.ItemViewHolder>{
         private List<Memo> listdata;
@@ -167,6 +193,9 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+
+
 }
 
 

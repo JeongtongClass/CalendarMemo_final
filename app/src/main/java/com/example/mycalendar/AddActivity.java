@@ -2,9 +2,12 @@ package com.example.mycalendar;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.DatePicker;
@@ -22,6 +25,7 @@ public class AddActivity extends AppCompatActivity {
     EditText edtText; //할일을 입력하세요
     TextView edtDate; //날짜가져옴
     TextView edtTime; //시간가져옴
+    String to;
 
     private TextView textView_Date; // 오늘의날짜
     private TextView texView_Time; //현재시간
@@ -36,10 +40,10 @@ public class AddActivity extends AppCompatActivity {
 
         this.InitializeView();
         this.InitializeListener();
-
         edtText = findViewById(R.id.edtMemo);
         edtDate = (TextView) findViewById(R.id.textView_date);
         edtTime = (TextView) findViewById(R.id.textView_time);
+
 
         findViewById(R.id.btnDone).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,7 +52,7 @@ public class AddActivity extends AppCompatActivity {
 
                 if (str.length() > 0) {
                     //Date date=new Date();
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    //SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                     String substr = edtDate.getText().toString();
                     String timestr= edtTime.getText().toString();
 
@@ -67,18 +71,26 @@ public class AddActivity extends AppCompatActivity {
                     //원래코드
                     setResult(0, intent);
 
+
                     finish();
 
                 }
             }
+
         });
 
         findViewById(R.id.btnNo).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //Intent intent =new Intent()
+                //startActivity(R.layout.activity_main);
                 finish();
+                Intent intent=new Intent(AddActivity.this, MainActivity.class);
+                startActivity(intent);
             }
         });
+
+
 
     }
 
